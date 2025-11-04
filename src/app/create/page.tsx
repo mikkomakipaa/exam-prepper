@@ -6,12 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { SubjectSelector } from '@/components/create/SubjectSelector';
 import { GradeSelector } from '@/components/create/GradeSelector';
-import { QuestionCountSelector } from '@/components/create/QuestionCountSelector';
 import { MaterialUpload } from '@/components/create/MaterialUpload';
-import { Subject } from '@/types';
-import { getSubject } from '@/config/subjects';
 import { Loader2, Star } from 'lucide-react';
 
 type CreateState = 'form' | 'loading' | 'success';
@@ -21,8 +17,9 @@ export default function CreatePage() {
 
   // Form state
   const [state, setState] = useState<CreateState>('form');
-  const [subject, setSubject] = useState<Subject>('english');
+  const [subject, setSubject] = useState('');
   const [grade, setGrade] = useState<number | undefined>(undefined);
+  const [examLength, setExamLength] = useState(20);
   const [questionCount, setQuestionCount] = useState(100);
   const [questionSetName, setQuestionSetName] = useState('');
   const [materialText, setMaterialText] = useState('');
@@ -33,12 +30,15 @@ export default function CreatePage() {
   const [questionSetsCreated, setQuestionSetsCreated] = useState<any[]>([]);
   const [totalQuestionsCreated, setTotalQuestionsCreated] = useState(0);
 
-  const subjectConfig = getSubject(subject);
-
   const handleSubmit = async () => {
     // Validation
     if (!questionSetName.trim()) {
       setError('Anna kysymyssarjalle nimi!');
+      return;
+    }
+
+    if (!subject.trim()) {
+      setError('Anna aineen nimi!');
       return;
     }
 
@@ -55,6 +55,7 @@ export default function CreatePage() {
       const formData = new FormData();
       formData.append('subject', subject);
       formData.append('questionCount', questionCount.toString());
+      formData.append('examLength', examLength.toString());
       formData.append('questionSetName', questionSetName);
 
       if (grade) {
@@ -108,9 +109,9 @@ export default function CreatePage() {
           <CardContent className="p-12 text-center">
             <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin text-blue-500" />
             <p className="text-xl font-bold text-indigo-700">
-              Luodaan {questionCount} kysymystä...
+              Luodaan kysymyssarjoja...
             </p>
-            <p className="text-gray-600 mt-2 font-medium">Luodaan 4 kysymyssarjaa (kaikki vaikeustasot)</p>
+            <p className="text-gray-600 mt-2 font-medium">4 vaikeustasoa × {examLength} kysymystä</p>
             <p className="text-gray-500 text-sm mt-1">Tämä kestää muutaman minuutin</p>
           </CardContent>
         </Card>
@@ -219,15 +220,57 @@ export default function CreatePage() {
               />
             </div>
 
-            <SubjectSelector selectedSubject={subject} onSubjectChange={setSubject} />
+            <div>
+              <label className="block text-lg font-bold mb-3 text-gray-800">
+                📚 Aine
+              </label>
+              <Input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Esim. Englanti, Matematiikka, Historia"
+                className="text-lg"
+              />
+            </div>
 
             <GradeSelector selectedGrade={grade} onGradeChange={setGrade} />
 
-            <QuestionCountSelector
-              subject={subject}
-              questionCount={questionCount}
-              onQuestionCountChange={setQuestionCount}
-            />
+            <div>
+              <label className="block text-lg font-bold mb-3 text-gray-800">
+                📊 Kokeen pituus (kysymystä per vaikeustaso)
+              </label>
+              <Input
+                type="number"
+                min={10}
+                max={50}
+                value={examLength}
+                onChange={(e) => setExamLength(parseInt(e.target.value) || 20)}
+                placeholder="20"
+                className="text-lg"
+              />
+              <p className="text-sm text-gray-600 mt-2">
+                Jokainen vaikeustaso sisältää tämän määrän kysymyksiä
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-lg font-bold mb-3 text-gray-800">
+                🔢 Materiaalista luotavien kysymysten määrä
+              </label>
+              <Input
+                type="number"
+                min={50}
+                max={200}
+                step={10}
+                value={questionCount}
+                onChange={(e) => setQuestionCount(parseInt(e.target.value) || 100)}
+                placeholder="100"
+                className="text-lg"
+              />
+              <p className="text-sm text-gray-600 mt-2">
+                AI luo tämän määrän kysymyksiä materiaalista (jaetaan vaikeusasteille)
+              </p>
+            </div>
 
             <MaterialUpload
               materialText={materialText}
@@ -249,9 +292,9 @@ export default function CreatePage() {
               <Button
                 onClick={handleSubmit}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-                disabled={!questionSetName.trim() || (!materialText.trim() && uploadedFiles.length === 0)}
+                disabled={!questionSetName.trim() || !subject.trim() || (!materialText.trim() && uploadedFiles.length === 0)}
               >
-                Luo {questionCount} kysymystä
+                Luo kysymyssarjat
               </Button>
             </div>
           </CardContent>
