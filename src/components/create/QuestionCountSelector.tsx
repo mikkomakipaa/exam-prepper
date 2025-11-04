@@ -1,6 +1,5 @@
 import { Subject } from '@/types';
 import { getSubject } from '@/config/subjects';
-import { Input } from '@/components/ui/input';
 
 interface QuestionCountSelectorProps {
   subject: Subject;
@@ -35,22 +34,6 @@ export function QuestionCountSelector({
         <div className="flex justify-between text-sm text-gray-600">
           <span>{min} kysymystä</span>
           <span>{max} kysymystä</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Tai syötä tarkka määrä:</span>
-          <Input
-            type="number"
-            min={min}
-            max={max}
-            value={questionCount}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              if (val >= min && val <= max) {
-                onQuestionCountChange(val);
-              }
-            }}
-            className="w-24"
-          />
         </div>
       </div>
     </div>

@@ -3,6 +3,8 @@ import { Question, Answer } from '@/types';
 import { shuffleArray } from '@/lib/utils';
 
 const DEFAULT_QUESTIONS_PER_SESSION = 15;
+const POINTS_PER_CORRECT = 10;
+const STREAK_BONUS = 5;
 
 export function useGameSession(allQuestions: Question[], questionsPerSession = DEFAULT_QUESTIONS_PER_SESSION) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -11,6 +13,9 @@ export function useGameSession(allQuestions: Question[], questionsPerSession = D
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
 
   const startNewSession = useCallback(() => {
     const shuffled = shuffleArray(allQuestions).slice(0, Math.min(questionsPerSession, allQuestions.length));
@@ -20,6 +25,9 @@ export function useGameSession(allQuestions: Question[], questionsPerSession = D
     setShowExplanation(false);
     setScore(0);
     setAnswers([]);
+    setTotalPoints(0);
+    setCurrentStreak(0);
+    setBestStreak(0);
   }, [allQuestions, questionsPerSession]);
 
   const submitAnswer = useCallback(() => {
@@ -66,8 +74,30 @@ export function useGameSession(allQuestions: Question[], questionsPerSession = D
         correctAnswer = null;
     }
 
+    let pointsEarned = 0;
+    let newStreak = currentStreak;
+
     if (isCorrect) {
       setScore((prev) => prev + 1);
+      newStreak = currentStreak + 1;
+      setCurrentStreak(newStreak);
+
+      // Calculate points: 10 base + 5 streak bonus if streak >= 3
+      pointsEarned = POINTS_PER_CORRECT;
+      if (newStreak >= 3) {
+        pointsEarned += STREAK_BONUS;
+      }
+
+      setTotalPoints((prev) => prev + pointsEarned);
+
+      // Update best streak
+      if (newStreak > bestStreak) {
+        setBestStreak(newStreak);
+      }
+    } else {
+      // Reset streak on wrong answer
+      setCurrentStreak(0);
+      newStreak = 0;
     }
 
     setAnswers((prev) => [
@@ -79,11 +109,13 @@ export function useGameSession(allQuestions: Question[], questionsPerSession = D
         correctAnswer,
         isCorrect,
         explanation: currentQuestion.explanation,
+        pointsEarned,
+        streakAtAnswer: newStreak,
       },
     ]);
 
     setShowExplanation(true);
-  }, [userAnswer, selectedQuestions, currentQuestionIndex]);
+  }, [userAnswer, selectedQuestions, currentQuestionIndex, currentStreak, bestStreak]);
 
   const nextQuestion = useCallback(() => {
     setCurrentQuestionIndex((prev) => prev + 1);
@@ -103,6 +135,9 @@ export function useGameSession(allQuestions: Question[], questionsPerSession = D
     score,
     answers,
     isLastQuestion,
+    totalPoints,
+    currentStreak,
+    bestStreak,
     setUserAnswer,
     submitAnswer,
     nextQuestion,

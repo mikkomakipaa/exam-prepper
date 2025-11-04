@@ -1,83 +1,63 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadByCode } from '@/components/shared/LoadByCode';
-import { Star } from 'lucide-react';
+import { Star, BookOpen } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
-  const [loadCode, setLoadCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleLoadByCode = async () => {
-    if (loadCode.length !== 6) return;
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Navigate to play page with the code
-      router.push(`/play/${loadCode}`);
-    } catch (err) {
-      setError('Virhe kysymyssarjan lataamisessa');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-purple-50 to-pink-50 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-3xl flex items-center gap-2 text-white">
-              <Star className="w-8 h-8" />
-              Kielikokeen kertaaja
+        <Card className="shadow-2xl border-0">
+          <CardHeader className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 text-white rounded-t-lg">
+            <CardTitle className="text-3xl md:text-4xl flex items-center justify-center gap-3 text-white">
+              <Star className="w-10 h-10 md:w-12 md:h-12 animate-pulse text-yellow-300" />
+              Koekertaaja
             </CardTitle>
-            <CardDescription className="text-white text-lg font-medium">
-              Luo kysymyksiä oppimateriaalista tai lataa valmis sarja
+            <CardDescription className="text-white text-lg md:text-xl font-medium text-center mt-2">
+              Harjoittele kokeisiin ja opi uutta! 🚀
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="p-6 md:p-8 space-y-4">
             <Button
-              onClick={() => router.push('/create')}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg py-6"
+              onClick={() => router.push('/play')}
+              className="w-full bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 hover:from-cyan-600 hover:via-teal-600 hover:to-purple-700 text-xl py-8 min-h-[72px] shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation"
             >
-              📝 Luo uusi kysymyssarja
+              <span className="text-3xl mr-3">🎮</span>
+              Aloita harjoittelu
             </Button>
 
-            <div className="flex items-center gap-3">
-              <div className="flex-1 border-t border-gray-300"></div>
-              <span className="text-gray-500 font-medium">TAI</span>
-              <div className="flex-1 border-t border-gray-300"></div>
-            </div>
+            <Button
+              onClick={() => router.push('/create')}
+              variant="outline"
+              className="w-full text-lg py-6 min-h-[64px] border-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 shadow-md hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] touch-manipulation"
+            >
+              <span className="text-2xl mr-2">📚</span>
+              Luo uusi koealue
+            </Button>
 
-            <LoadByCode
-              code={loadCode}
-              loading={loading}
-              onCodeChange={setLoadCode}
-              onLoad={handleLoadByCode}
-            />
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h3 className="font-bold text-gray-800 mb-2">ℹ️ Miten tämä toimii?</h3>
-              <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
-                <li>Luo uusi kysymyssarja lataamalla oppimateriaaleja tai kirjoittamalla tekstiä</li>
-                <li>Jaa kysymyssarjan koodi ystäville</li>
-                <li>Pelaa kysymyksiä ja opi uutta!</li>
-                <li>Ei vaadi kirjautumista - kaikki toimii koodilla</li>
+            <div className="mt-6 p-6 bg-gradient-to-r from-violet-50 via-purple-50 to-fuchsia-50 rounded-xl border-2 border-purple-200 shadow-sm">
+              <h3 className="font-bold text-purple-900 mb-3 text-lg flex items-center gap-2">
+                <span className="text-2xl">✨</span>
+                Näin pääset alkuun:
+              </h3>
+              <ul className="text-base text-purple-800 space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-xl">🎯</span>
+                  <span><strong>Valitse koealue</strong> ja aloita harjoittelu heti</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-xl">💎</span>
+                  <span><strong>Kerää pisteitä</strong> ja rakenna putkia oikeilla vastauksilla</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-xl">🏆</span>
+                  <span><strong>Avaa saavutuksia</strong> ja ylitä itsesi!</span>
+                </li>
               </ul>
             </div>
           </CardContent>

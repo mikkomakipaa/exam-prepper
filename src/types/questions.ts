@@ -102,6 +102,8 @@ export interface Answer {
   correctAnswer: any;
   isCorrect: boolean;
   explanation: string;
+  pointsEarned?: number;
+  streakAtAnswer?: number;
 }
 
 // Material Upload
