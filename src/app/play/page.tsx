@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getRecentQuestionSets } from '@/lib/supabase/queries';
 import { QuestionSet, Difficulty } from '@/types';
-import { Loader2, BookOpen, Clock, BarChart3, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, BookOpen } from 'lucide-react';
 
 type BrowseState = 'loading' | 'loaded' | 'error';
 
@@ -26,7 +26,6 @@ export default function PlayBrowsePage() {
 
   const [state, setState] = useState<BrowseState>('loading');
   const [groupedSets, setGroupedSets] = useState<GroupedQuestionSets[]>([]);
-  const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   const difficultyLabels: Record<string, string> = {
@@ -56,14 +55,26 @@ export default function PlayBrowsePage() {
         setState('loading');
         const sets = await getRecentQuestionSets(100); // Load more sets
 
-        // Group question sets by name, subject, topic, subtopic
+        // Helper function to remove difficulty suffix from name
+        const stripDifficultySuffix = (name: string): string => {
+          const suffixes = [' - Helppo', ' - Normaali', ' - Vaikea', ' - Mahdoton'];
+          for (const suffix of suffixes) {
+            if (name.endsWith(suffix)) {
+              return name.slice(0, -suffix.length);
+            }
+          }
+          return name;
+        };
+
+        // Group question sets by name (without difficulty), subject, topic, subtopic
         const grouped = sets.reduce((acc, set) => {
-          const key = `${set.name}|${set.subject}|${set.topic || ''}|${set.subtopic || ''}`;
+          const cleanName = stripDifficultySuffix(set.name);
+          const key = `${cleanName}|${set.subject}|${set.topic || ''}|${set.subtopic || ''}`;
 
           if (!acc[key]) {
             acc[key] = {
               key,
-              name: set.name,
+              name: cleanName,
               subject: set.subject,
               topic: set.topic,
               subtopic: set.subtopic,
@@ -102,10 +113,6 @@ export default function PlayBrowsePage() {
       society: '🏛️ Yhteiskuntaoppi',
     };
     return labels[subject] || subject;
-  };
-
-  const toggleExpand = (key: string) => {
-    setExpandedKey(expandedKey === key ? null : key);
   };
 
   const getAvailableDifficulties = (sets: QuestionSet[]) => {
@@ -153,90 +160,60 @@ export default function PlayBrowsePage() {
         )}
 
         {groupedSets.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {groupedSets.map((group) => {
-              const isExpanded = expandedKey === group.key;
               const availableDifficulties = getAvailableDifficulties(group.sets);
 
               return (
                 <div
                   key={group.key}
-                  className="border border-gray-200 rounded-xl overflow-hidden transition-all"
+                  className="border border-gray-200 rounded-xl p-5 bg-white hover:shadow-md transition-all"
                 >
-                  {/* Topic Card */}
-                  <button
-                    onClick={() => toggleExpand(group.key)}
-                    className="w-full text-left p-5 hover:bg-purple-50/50 transition-all cursor-pointer group"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors mb-3">
-                          {group.name}
-                        </h3>
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {group.name}
+                  </h3>
 
-                        {/* Badges */}
-                        <div className="flex flex-wrap gap-2 items-center">
-                          <span className="text-sm text-gray-600">
-                            {getSubjectLabel(group.subject)}
-                          </span>
-                          {group.grade && (
-                            <span className="text-sm text-gray-500">
-                              • Luokka {group.grade}
-                            </span>
-                          )}
-                          <span className="text-sm text-gray-500">
-                            • {availableDifficulties.length} vaikeustasoa
-                          </span>
-                        </div>
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-2 items-center mb-4">
+                    <span className="text-sm text-gray-600">
+                      {getSubjectLabel(group.subject)}
+                    </span>
+                    {group.grade && (
+                      <span className="text-sm text-gray-500">
+                        • Luokka {group.grade}
+                      </span>
+                    )}
+                    <span className="text-sm text-gray-500">
+                      • {group.sets[0]?.question_count || 0} kysymystä
+                    </span>
+                  </div>
 
-                        {(group.topic || group.subtopic) && (
-                          <p className="text-sm text-gray-500 mt-2">
-                            {[group.topic, group.subtopic].filter(Boolean).join(' → ')}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Expand Icon */}
-                      <div className="flex-shrink-0">
-                        {isExpanded ? (
-                          <ChevronUp className="w-6 h-6 text-gray-400" />
-                        ) : (
-                          <ChevronDown className="w-6 h-6 text-gray-400" />
-                        )}
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Difficulty Selector - Expanded */}
-                  {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 bg-gray-50 border-t border-gray-200">
-                      <p className="text-sm text-gray-600 mb-3 font-medium">
-                        Valitse vaikeustaso:
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {availableDifficulties.map((difficulty) => {
-                          const set = group.sets.find(s => s.difficulty === difficulty);
-                          const colors = difficultyColors[difficulty];
-                          const emoji = difficultyEmojis[difficulty];
-
-                          return (
-                            <Button
-                              key={difficulty}
-                              onClick={() => set && router.push(`/play/${set.code}`)}
-                              className={`${colors.bg} ${colors.hover} text-white py-4 rounded-lg font-semibold transition-all`}
-                            >
-                              <span className="text-xl mr-2">{emoji}</span>
-                              {difficultyLabels[difficulty]}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        {group.sets[0]?.question_count || 0} kysymystä per taso
-                      </p>
-                    </div>
+                  {(group.topic || group.subtopic) && (
+                    <p className="text-sm text-gray-500 mb-4">
+                      {[group.topic, group.subtopic].filter(Boolean).join(' → ')}
+                    </p>
                   )}
+
+                  {/* Difficulty Buttons - Inline */}
+                  <div className="flex flex-wrap gap-2">
+                    {availableDifficulties.map((difficulty) => {
+                      const set = group.sets.find(s => s.difficulty === difficulty);
+                      const colors = difficultyColors[difficulty];
+                      const emoji = difficultyEmojis[difficulty];
+
+                      return (
+                        <button
+                          key={difficulty}
+                          onClick={() => set && router.push(`/play/${set.code}`)}
+                          className={`${colors.bg} ${colors.hover} text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-95`}
+                        >
+                          <span className="mr-1.5">{emoji}</span>
+                          {difficultyLabels[difficulty]}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })}

@@ -6,7 +6,7 @@ export type QuestionType =
   | 'matching'
   | 'short_answer';
 
-export type Subject = 'english' | 'math' | 'history' | 'society';
+export type Subject = string;
 
 export type Difficulty = 'helppo' | 'normaali' | 'vaikea' | 'mahdoton';
 

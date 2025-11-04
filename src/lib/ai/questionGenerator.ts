@@ -1,6 +1,7 @@
 import { Question, Subject, Difficulty } from '@/types';
 import { generateWithClaude, MessageContent } from './anthropic';
 import { getEnglishPrompt } from '@/config/prompts/english';
+import { getGenericPrompt } from '@/config/prompts/generic';
 import { shuffleArray } from '@/lib/utils';
 
 export interface GenerateQuestionsParams {
@@ -56,13 +57,12 @@ export async function generateQuestions(
 
   // Get prompt based on subject
   let prompt = '';
-  switch (subject) {
-    case 'english':
-      prompt = getEnglishPrompt(difficulty, questionCount, grade, materialText);
-      break;
-    // Future subjects will be added here
-    default:
-      throw new Error(`Unsupported subject: ${subject}`);
+  if (subject.toLowerCase() === 'english' || subject.toLowerCase() === 'englanti') {
+    // Use specialized English prompt
+    prompt = getEnglishPrompt(difficulty, questionCount, grade, materialText);
+  } else {
+    // Use generic prompt for all other subjects
+    prompt = getGenericPrompt(subject, difficulty, questionCount, grade, materialText);
   }
 
   messageContent.push({
