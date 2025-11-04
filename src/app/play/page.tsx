@@ -143,13 +143,10 @@ export default function PlayBrowsePage() {
                 <CardContent className="p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-xl md:text-2xl font-bold text-purple-700 flex-1">
+                      <div className="mb-3">
+                        <h3 className="text-xl md:text-2xl font-bold text-purple-700">
                           {set.name}
                         </h3>
-                        <span className="font-mono text-lg font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded ml-2">
-                          {set.code}
-                        </span>
                       </div>
 
                       <div className="flex flex-wrap gap-3 mb-3">
