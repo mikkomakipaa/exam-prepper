@@ -246,7 +246,7 @@ export default function PlayPage() {
             className="w-full text-gray-600 hover:text-gray-900"
           >
             <List className="w-4 h-4 mr-2" />
-            Valitse eri alue
+            Valitse eri aihealue
           </Button>
         </div>
       </div>

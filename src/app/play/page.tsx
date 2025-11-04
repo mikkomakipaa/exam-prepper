@@ -91,7 +91,7 @@ export default function PlayBrowsePage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-purple-600" />
-          <p className="text-lg text-gray-600">Ladataan kokealueita...</p>
+          <p className="text-lg text-gray-600">Ladataan aihealueita...</p>
         </div>
       </div>
     );
@@ -104,9 +104,9 @@ export default function PlayBrowsePage() {
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-7 h-7 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Kokealueet</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Aihealueet</h1>
           </div>
-          <p className="text-gray-600">Valitse alue aloittaaksesi harjoittelun</p>
+          <p className="text-gray-600">Valitse aihealue aloittaaksesi harjoittelun</p>
         </div>
 
         {state === 'error' && (
@@ -144,11 +144,11 @@ export default function PlayBrowsePage() {
                     </span>
                     {set.grade && (
                       <span className="text-sm text-gray-500">
-                        • Grade {set.grade}
+                        • Luokka {set.grade}
                       </span>
                     )}
                     <span className="text-sm text-gray-500">
-                      • {set.question_count} questions
+                      • {set.question_count} kysymystä
                     </span>
                   </div>
 
