@@ -2,6 +2,8 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
+  timeout: 120000, // 2 minutes timeout
+  maxRetries: 2, // Retry failed requests twice
 });
 
 export interface MessageContent {
@@ -54,7 +56,14 @@ export async function generateWithClaude(
       },
     };
   } catch (error) {
-    console.error('Error calling Anthropic API:', error);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      console.error('Error calling Anthropic API');
+    } else {
+      console.error('Error calling Anthropic API:', error);
+    }
+
     throw new Error('Failed to generate content with AI');
   }
 }
