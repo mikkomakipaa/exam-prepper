@@ -6,53 +6,104 @@ export function getMathPrompt(
   grade?: number,
   material?: string
 ): string {
-  const difficultyInstructions = {
-    helppo: `
-- Peruslaskutoimitukset (yhteen-, vähennys-, kerto- ja jakolasku)
-- Yksinkertaiset luvut (kokonaisluvut alle 100)
-- Selkeät ja suorat kysymykset
-- Perusgeometria (muodot, kehä, pinta-ala)
-- Yksivaiheiset ongelmat`,
-    normaali: `
-- Monivaiheinen laskenta (useita laskutoimituksia)
-- Murtoluvut, desimaaliluvut ja prosentit
-- Yhtälöiden ratkaiseminen (yksinkertainen algebra)
-- Geometria (tilavuus, kulmat, kolmiot)
-- Sanallisia tehtäviä (käytännön sovellukset)
-- Laskujärjestys ja sulkujen käyttö`,
-    vaikea: `
-- Monimutkaiset yhtälöt ja yhtälöryhmät
-- Funktiot ja kuvaajat
-- Trigonometria (sin, cos, tan)
-- Kehittynyt geometria (Pythagoraan lause, kolmioiden ratkaiseminen)
-- Monivaiheisia sanallisia tehtäviä
-- Potenssilaskenta ja juuret`,
-    mahdoton: `
-- Edistynyt algebra (polynomit, neliöjuuri-yhtälöt)
-- Todistukset ja matemaattinen päättely
-- Analyyttinen geometria (koordinaatisto, suorat, ympyrät)
-- Yhdistelmät useista matematiikan osa-alueista
-- Haastavia logiikkatehtäviä
-- Epäsuorat ja monimutkaiset ongelmat`,
+  // Finnish curriculum-based content for each grade
+  const gradeContent = {
+    4: `
+VUOSILUOKKA 4 - OPETUSSUUNNITELMAN SISÄLTÖ:
+- Lukualue: luvut 0-10 000
+- Laskutoimitukset: yhteen-, vähennys-, kerto- ja jakolasku
+- Kertotaulut: kertotaulut 6-9 opitaan, kertotaulut 1-10 hallitaan
+- Desimaalijärjestelmä: kymmenjärjestelmän syventäminen
+- Lukujen rakenne: lukujen yhteydet ja jaollisuus
+- Perusgeometria: suorakulmio, neliö, kolmio, ympyrä
+- Mittaaminen: pituus, massa, aika
+- Päässälasku: päässälaskutaitojen harjoittelu`,
+    5: `
+VUOSILUOKKA 5 - OPETUSSUUNNITELMAN SISÄLTÖ:
+- Lukualue: luvut 0-100 000
+- Desimaaliluvut: desimaalilukujen käsittelyn syventäminen
+- Murtoluvut: murtolukujen peruskäsitteet (1/2, 1/4, 1/3, 1/5, 1/10)
+- Prosentit: prosentin käsitteen esittely
+- Pinta-ala ja piiri: suorakulmio, neliö
+- Tilavuus: kuutio, suorakulmainen särmiö (alkeet)
+- Koordinaatisto: koordinaatiston perusteet
+- Tilastot: tiedon esittäminen graafisesti`,
+    6: `
+VUOSILUOKKA 6 - OPETUSSUUNNITELMAN SISÄLTÖ:
+- Negatiiviset luvut: negatiivisten lukujen esittely ja laskutoimitukset
+- Suhde ja verranto: suhteen käsite, yksinkertaiset verrannot
+- Prosentit: prosenttilaskenta (prosenttiyksikkö, prosenttiosuus, perusarvo)
+- Yhtälöt: yksinkertaisten yhtälöiden ratkaiseminen
+- Geometria: kulmat, kolmioiden ja nelikulmioiden ominaisuudet
+- Tilavuus: tilavuuden laskeminen
+- Tilastot ja todennäköisyys: keskiarvon laskeminen, todennäköisyyden alkeet`,
   };
 
-  const gradeContext = grade ? `Kysymysten tulee olla sopivan haastavuustason ${grade}. luokkalaiselle.` : '';
+  // Difficulty-specific instructions with question type guidance
+  const difficultyInstructions = {
+    helppo: `
+VAIKEUSTASO: Helppo
+- Peruslaskutoimitukset ja yksinkertaiset ongelmat
+- Selkeät ja suorat kysymykset ilman monimutkaisia välivaiheita
+- Pääpaino: YMMÄRRYKSEN TESTAAMINEN perusasioissa
+- Yksivaiheiset laskut ja selkeät tehtävät
+
+KYSYMYSTYYPPIEN JAKAUMA (Helppo):
+- 70% multiple_choice (monivalinta)
+- 20% true_false (totta/tarua)
+- 10% fill_blank (täydennä, yksinkertainen numeerinen vastaus)
+- ÄLÄ käytä short_answer tai matching`,
+    normaali: `
+VAIKEUSTASO: Normaali
+- Monivaiheinen laskenta ja yhdistelmätehtävät
+- Vaatii soveltamista ja ymmärrystä
+- Sanallisia tehtäviä ja käytännön sovelluksia
+- 2-3 vaiheen ongelmat
+
+KYSYMYSTYYPPIEN JAKAUMA (Normaali):
+- 50% multiple_choice (monivalinta)
+- 20% fill_blank (täydennä, numeerinen tai lyhyt vastaus)
+- 15% true_false (totta/tarua)
+- 15% short_answer (lyhyt vastaus, vaatii selitystä tai askelia)
+- Voit käyttää matching jos sopii aiheeseen`,
+    vaikea: `
+VAIKEUSTASO: Vaikea
+- Monimutkaisia ongelmia ja useamman käsitteen yhdistämistä
+- Vaatii syvällistä ymmärrystä ja analyyttista ajattelua
+- Todistukset, perustelut ja monivaiheisia ratkaisuja
+- Epäsuorat kysymykset ja ongelmanratkaisu
+
+KYSYMYSTYYPPIEN JAKAUMA (Vaikea):
+- 40% short_answer (avoin vastaus, vaatii laskun näyttämistä tai perustelua)
+- 30% multiple_choice (monivalinta, mutta vaikeammat laskut)
+- 20% fill_blank (täydennä, vaatii laskemista)
+- 10% true_false tai matching
+- Suosi kysymyksiä jotka vaativat PERUSTELUA ja LASKUVAIHEIDEN NÄYTTÄMISTÄ`,
+  };
+
+  const gradeContext = grade && gradeContent[grade as 4 | 5 | 6]
+    ? gradeContent[grade as 4 | 5 | 6]
+    : '';
+
+  const gradeNote = grade
+    ? `\nKysymysten tulee olla sopivan haastavuustason ${grade}. luokkalaiselle ja perustua ${grade}. luokan opetussuunnitelman sisältöön.`
+    : '';
 
   return `Analysoi ${material ? 'seuraava materiaali' : 'nämä dokumentit'} ja luo ${questionCount} monipuolista matematiikan kysymystä koevalmistautumiseen.
 
-VAIKEUSTASO: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-
 ${gradeContext}
 
-VAIKEUSTASON OHJEET:
 ${difficultyInstructions[difficulty]}
+${gradeNote}
 
 ${material ? `MATERIAALI:\n${material}\n\n` : ''}TÄRKEÄÄ - KYSYMYSTEN MUOTO:
 - Kysymykset ja selitykset esitetään SUOMEKSI
 - Käytä LaTeX-merkintää matematiikan kaavoille ja symboleille
-- Vaihtele kysymystyyppejä ja aiheita
+- Vaihtele kysymystyyppejä JA aiheita opetussuunnitelman mukaan
 - Luo TÄSMÄLLEEN ${questionCount} kysymystä
 - Varmista että laskut ovat oikein
+- NOUDATA TARKASTI vaikeustason kysymystyyppien jakaumaa
+- PERUSTA kysymykset annettuun materiaaliin ${gradeContext ? `ja ${grade}. luokan opetussuunnitelmaan` : ''}
 
 MATEMAATTINEN MERKINTÄTAPA:
 - Käytä LaTeX-merkintää: $$formula$$  (esim. $$x^2 + 2x + 1 = 0$$)
@@ -64,73 +115,61 @@ MATEMAATTINEN MERKINTÄTAPA:
 - Trigonometria: $$\\sin(x)$$, $$\\cos(x)$$, $$\\tan(x)$$
 - Erikoismerkit: $$\\times$$ (kertomerkki), $$\\div$$ (jakomerkki), $$\\pm$$ (plus-miinus)
 
-KYSYMYSTYYPIT JA ESIMERKIT:
+KYSYMYSTYYPPIEN KÄYTTÖOHJEET:
 
-1. Laskutehtävä (monivalinta):
-   Kysymys: "Laske: $$15 \\times 8 + 12$$"
-   Vaihtoehdot: ["132", "120", "144", "108"]
-   Oikea vastaus: "132"
+1. MULTIPLE_CHOICE (monivalinta):
+   - Sopii: laskutehtävät, yhtälöt, geometria, käsitteiden tunnistaminen
+   - Esim: "Laske: $$15 \\times 8 + 12$$"
+   - Vaihtoehdot: 4 kpl, yksi oikea vastaus
+   - Väärät vastaukset: yleisiä laskuvirheitä (unohdettu termi, väärä laskujärjestys, etc)
 
-2. Yhtälö (monivalinta):
-   Kysymys: "Ratkaise yhtälö: $$2x + 5 = 13$$"
-   Vaihtoehdot: ["4", "6", "8", "9"]
-   Oikea vastaus: "4"
+2. TRUE_FALSE (totta/tarua):
+   - Sopii: käsitteiden ymmärtäminen, sääntöjen tunnistaminen
+   - Esim: "Totta vai tarua: Neliön kaikki sivut ovat yhtä pitkiä."
 
-3. Sanallinen tehtävä (monivalinta):
-   Kysymys: "Liisa ostaa 3 kirjaa, joiden hinta on 12€ kappale. Paljonko hän maksaa yhteensä?"
-   Vaihtoehdot: ["36€", "30€", "42€", "24€"]
-   Oikea vastaus: "36€"
+3. FILL_BLANK (täydennä):
+   - Helppo: yksinkertainen numeerinen vastaus
+   - Normaali/Vaikea: vaatii laskemista
+   - Esim: "Laske: $$7^2 - 5 \\times 3$$ = ___"
+   - Anna acceptable_answers listaan vaihtoehtoiset muodot
 
-4. Geometria (monivalinta):
-   Kysymys: "Suorakulmion leveys on 5 cm ja pituus 8 cm. Mikä on sen pinta-ala?"
-   Vaihtoehdot: ["40 cm²", "26 cm²", "13 cm²", "45 cm²"]
-   Oikea vastaus: "40 cm²"
+4. SHORT_ANSWER (lyhyt avoin vastaus):
+   - VAIN normaali ja vaikea vaikeustasoilla
+   - Vaatii selitystä, perustelua tai laskuvaiheiden näyttämistä
+   - Esim: "Selitä miksi $$\\frac{2}{4} = \\frac{1}{2}$$. Näytä laskuvaiheet."
+   - Esim: "Ratkaise yhtälö $$2x + 5 = 13$$ ja näytä välivaiheet."
+   - correct_answer sisältää esimerkkivastauksen laskuvaiheilla
 
-5. Murtoluvut (monivalinta):
-   Kysymys: "Laske: $$\\frac{3}{4} + \\frac{1}{2}$$"
-   Vaihtoehdot: ["$$\\frac{5}{4}$$", "$$\\frac{4}{6}$$", "$$\\frac{1}{4}$$", "$$\\frac{7}{8}$$"]
-   Oikea vastaus: "$$\\frac{5}{4}$$"
-
-6. Täydennystehtävä (numeerinen vastaus):
-   Kysymys: "Laske: $$7^2 - 5 \\times 3$$"
-   Vastaus: "34"
-   Hyväksyttävät vastaukset: ["34", "34.0"]
-
-7. Totta/Epätotta:
-   Kysymys: "Totta vai tarua: Neliön kaikki sivut ovat yhtä pitkiä."
-   Vastaus: true
-
-8. Prosentit (monivalinta):
-   Kysymys: "Paljonko on 25% luvusta 80?"
-   Vaihtoehdot: ["20", "25", "15", "30"]
-   Oikea vastaus: "20"
+5. MATCHING (paritus):
+   - Sopii: termit ja määritelmät, kaavat ja nimet
+   - Käytä säästeliäästi, vain jos aihe sopii
 
 NUMEERISTEN VASTAUSTEN KÄSITTELY:
 - Anna pääasiallinen oikea vastaus "correct_answer" -kentässä
 - Lisää "acceptable_answers" -taulukkoon vaihtoehtoiset hyväksyttävät muodot:
-  * Desimaaliluvut ja murtoluvut: "0.5" ja "$$\\frac{1}{2}$$" ja "1/2"
+  * Desimaaliluvut ja murtoluvut: "0.5" ja "$$\\frac{1}{2}$$" ja "1/2" ja "0,5"
   * Prosentit: "50%" ja "0.5" ja "0,5"
   * Eri merkitsemistavat: "3,14" ja "3.14"
   * Sievennetyt ja sieventämättömät muodot: "$$\\frac{2}{4}$$" ja "$$\\frac{1}{2}$$"
   * Kokonaisluvut: "5" ja "5.0" ja "5,0"
 
-HUOM! VASTAUSVAIHTOEHTOJEN USKOTTAVUUS:
-- Väärät vastaukset tulee olla uskottavia (esim. yleisiä laskuvirheitä)
-- Esimerkki: Jos oikea vastaus on 24, väärät vaihtoehdot voivat olla:
-  * 20 (unohdettu yksi termi)
-  * 28 (yhteenlasku kertolaskun sijaan)
-  * 12 (jaettu kahdella vahingossa)
+VÄÄRÄT VASTAUKSET (multiple_choice):
+Väärät vastaukset tulee olla uskottavia - käytä yleisiä laskuvirheitä:
+- Unohdettu termi: Jos oikea vastaus on 24, väärä voi olla 20
+- Väärä operaatio: 28 (yhteenlasku kertolaskun sijaan)
+- Laskujärjestysvirhe: 35 (laskettu vasemmalta oikealle ilman järjestystä)
+- Yksikkövirhe tai väärä muunnos
 
 Luo kysymykset JSON-muodossa. VASTAA VAIN JSON-MUODOSSA ILMAN MITÄÄN MUUTA TEKSTIÄ:
 
 [
   {
     "question": "kysymysteksti suomeksi (voi sisältää LaTeX-merkintää)",
-    "type": "multiple_choice" | "fill_blank" | "true_false",
+    "type": "multiple_choice" | "fill_blank" | "true_false" | "short_answer" | "matching",
     "options": ["vaihtoehto1", "vaihtoehto2", "vaihtoehto3", "vaihtoehto4"], // vain multiple_choice
-    "correct_answer": "oikea vastaus (voi sisältää LaTeX-merkintää)",
+    "correct_answer": "oikea vastaus (voi sisältää LaTeX-merkintää ja selityksen jos short_answer)",
     "acceptable_answers": ["vaihtoehtoinen muoto 1", "vaihtoehtoinen muoto 2"], // vapaaehtoinen, erityisesti fill_blank
-    "explanation": "selitys suomeksi kuinka vastaus saadaan (voi sisältää LaTeX-laskuja)"
+    "explanation": "selitys suomeksi kuinka vastaus saadaan (näytä laskuvaiheet)"
   }
 ]
 
@@ -138,8 +177,9 @@ Varmista että:
 - Jokainen kysymys on uniikki
 - Kaikki laskut on tarkistettu ja ovat oikein
 - Väärät vastaukset ovat uskottavia (yleisiä laskuvirheitä)
-- Selitykset näyttävät laskuaskeleet
-- Kysymykset kattavat eri matematiikan osa-alueita
+- Selitykset näyttävät laskuaskeleet selkeästi
+- Kysymykset perustuvat annettuun materiaaliin ${gradeContext ? `ja ${grade}. luokan opetussuunnitelmaan` : ''}
 - LaTeX-merkintä on oikein muotoiltu
-- Numeeristen vastausten kaikki hyväksyttävät muodot on listattu`;
+- Numeeristen vastausten kaikki hyväksyttävät muodot on listattu
+- KYSYMYSTYYPPIEN JAKAUMA vastaa vaikeustason ohjeita`;
 }
