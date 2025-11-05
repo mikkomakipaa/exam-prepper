@@ -3,6 +3,7 @@ import { generateWithClaude, MessageContent } from './anthropic';
 import { getEnglishPrompt } from '@/config/prompts/english';
 import { getGenericPrompt } from '@/config/prompts/generic';
 import { shuffleArray } from '@/lib/utils';
+import { aiQuestionArraySchema } from '@/lib/validation/schemas';
 
 export interface GenerateQuestionsParams {
   subject: Subject;
@@ -80,9 +81,32 @@ export async function generateQuestions(
   try {
     parsedQuestions = JSON.parse(cleanContent);
   } catch (error) {
-    console.error('Failed to parse AI response:', cleanContent);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      console.error('Failed to parse AI response');
+    } else {
+      console.error('Failed to parse AI response:', cleanContent);
+    }
+
     throw new Error('AI returned invalid JSON format');
   }
+
+  // Validate AI response structure with Zod
+  const validationResult = aiQuestionArraySchema.safeParse(parsedQuestions);
+  if (!validationResult.success) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      console.error('AI response validation failed');
+    } else {
+      console.error('AI response validation failed:', validationResult.error.errors);
+    }
+
+    throw new Error('AI returned invalid question format');
+  }
+
+  parsedQuestions = validationResult.data;
 
   // Validate and transform questions
   const questions: Question[] = parsedQuestions.map((q, index) => {

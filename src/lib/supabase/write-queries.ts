@@ -27,7 +27,14 @@ export async function createQuestionSet(
     .single();
 
   if (setError || !newSet) {
-    console.error('Error creating question set:', setError);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      console.error('Error creating question set');
+    } else {
+      console.error('Error creating question set:', setError);
+    }
+
     return null;
   }
 
@@ -81,7 +88,14 @@ export async function createQuestionSet(
     .insert(questionsToInsert as any);
 
   if (questionsError) {
-    console.error('Error creating questions:', questionsError);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      console.error('Error creating questions');
+    } else {
+      console.error('Error creating questions:', questionsError);
+    }
+
     // Rollback: delete the question set
     const admin = getSupabaseAdmin();
     await admin.from('question_sets').delete().eq('id', (newSet as any).id);
