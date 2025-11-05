@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
       questionCount: parseInt(formData.get('questionCount') as string),
       questionSetName: formData.get('questionSetName') as string,
       grade: formData.get('grade') ? parseInt(formData.get('grade') as string) : undefined,
-      topic: formData.get('topic') as string | undefined,
-      subtopic: formData.get('subtopic') as string | undefined,
-      materialText: formData.get('materialText') as string | undefined,
+      topic: (formData.get('topic') as string | null) || undefined,
+      subtopic: (formData.get('subtopic') as string | null) || undefined,
+      materialText: (formData.get('materialText') as string | null) || undefined,
     };
 
     // Validate input with Zod schema
@@ -142,10 +142,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Define all difficulty levels
-    const difficulties: Difficulty[] = ['helppo', 'normaali', 'vaikea', 'mahdoton'];
+    const difficulties: Difficulty[] = ['helppo', 'normaali', 'vaikea'];
 
-    // Calculate questions per difficulty (25% each)
-    const questionsPerDifficulty = Math.floor(questionCount / 4);
+    // Calculate questions per difficulty (33% each)
+    const questionsPerDifficulty = Math.floor(questionCount / 3);
 
     // Array to store created question sets
     const createdSets: any[] = [];
