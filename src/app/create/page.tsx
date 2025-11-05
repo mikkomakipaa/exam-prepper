@@ -80,10 +80,9 @@ export default function CreatePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.details
-          ? `${data.error}: ${data.details.join(', ')}`
-          : data.error || 'Kysymysten luonti epäonnistui';
-        throw new Error(errorMessage);
+        const errorMessage = data.error || 'Kysymysten luonti epäonnistui';
+        const errorDetails = data.details ? `\n\n${data.details}` : '';
+        throw new Error(errorMessage + errorDetails);
       }
 
       // Success
@@ -92,7 +91,8 @@ export default function CreatePage() {
       setState('success');
     } catch (err) {
       console.error('Error generating questions:', err);
-      setError(err instanceof Error ? err.message : 'Kysymysten luonti epäonnistui');
+      const errorMessage = err instanceof Error ? err.message : 'Kysymysten luonti epäonnistui';
+      setError(errorMessage);
       setState('form');
     }
   };

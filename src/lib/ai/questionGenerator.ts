@@ -5,6 +5,9 @@ import { getMathPrompt } from '@/config/prompts/math';
 import { getGenericPrompt } from '@/config/prompts/generic';
 import { shuffleArray } from '@/lib/utils';
 import { aiQuestionArraySchema } from '@/lib/validation/schemas';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'questionGenerator' });
 
 export interface GenerateQuestionsParams {
   subject: Subject;
@@ -86,33 +89,54 @@ export async function generateQuestions(
   let parsedQuestions: any[];
   try {
     parsedQuestions = JSON.parse(cleanContent);
+    logger.info(
+      { questionCount: parsedQuestions.length },
+      'Successfully parsed AI response'
+    );
   } catch (error) {
-    const isProduction = process.env.NODE_ENV === 'production';
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+        contentLength: cleanContent.length,
+        contentPreview: process.env.NODE_ENV === 'production'
+          ? undefined
+          : cleanContent.substring(0, 500),
+      },
+      'Failed to parse AI response as JSON'
+    );
 
-    if (isProduction) {
-      console.error('Failed to parse AI response');
-    } else {
-      console.error('Failed to parse AI response:', cleanContent);
-    }
-
-    throw new Error('AI returned invalid JSON format');
+    throw new Error('AI returned invalid JSON format. The response could not be parsed.');
   }
 
   // Validate AI response structure with Zod
   const validationResult = aiQuestionArraySchema.safeParse(parsedQuestions);
   if (!validationResult.success) {
-    const isProduction = process.env.NODE_ENV === 'production';
+    logger.error(
+      {
+        errors: validationResult.error.errors.map(e => ({
+          path: e.path.join('.'),
+          message: e.message,
+        })),
+        questionCount: parsedQuestions.length,
+        firstQuestionSample: process.env.NODE_ENV === 'production'
+          ? undefined
+          : parsedQuestions[0],
+      },
+      'AI response validation failed'
+    );
 
-    if (isProduction) {
-      console.error('AI response validation failed');
-    } else {
-      console.error('AI response validation failed:', validationResult.error.errors);
-    }
-
-    throw new Error('AI returned invalid question format');
+    throw new Error('AI returned invalid question format. Please try again.');
   }
 
   parsedQuestions = validationResult.data;
+  logger.info(
+    {
+      validatedQuestionCount: parsedQuestions.length,
+      subject,
+      difficulty,
+    },
+    'AI response validated successfully'
+  );
 
   // Validate and transform questions
   const questions: Question[] = parsedQuestions.map((q, index) => {
