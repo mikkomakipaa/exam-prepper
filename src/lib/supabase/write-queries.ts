@@ -32,7 +32,8 @@ export async function createQuestionSet(
     if (isProduction) {
       console.error('Error creating question set');
     } else {
-      console.error('Error creating question set:', setError);
+      console.error('Error creating question set:', JSON.stringify(setError, null, 2));
+      console.error('Attempted to insert:', JSON.stringify(questionSet, null, 2));
     }
 
     return null;
@@ -93,7 +94,11 @@ export async function createQuestionSet(
     if (isProduction) {
       console.error('Error creating questions');
     } else {
-      console.error('Error creating questions:', questionsError);
+      console.error('Error creating questions:', JSON.stringify(questionsError, null, 2));
+      console.error('Attempted to insert questions count:', questionsToInsert.length);
+      if (questionsToInsert.length > 0) {
+        console.error('First question sample:', JSON.stringify(questionsToInsert[0], null, 2));
+      }
     }
 
     // Rollback: delete the question set
