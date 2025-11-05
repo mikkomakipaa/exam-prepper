@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { GradeSelector } from '@/components/create/GradeSelector';
 import { MaterialUpload } from '@/components/create/MaterialUpload';
@@ -19,8 +20,8 @@ export default function CreatePage() {
   const [state, setState] = useState<CreateState>('form');
   const [subject, setSubject] = useState('');
   const [grade, setGrade] = useState<number | undefined>(undefined);
-  const [examLength, setExamLength] = useState(20);
-  const [questionCount, setQuestionCount] = useState(100);
+  const [examLength, setExamLength] = useState(15);
+  const [questionCount, setQuestionCount] = useState(50);
   const [questionSetName, setQuestionSetName] = useState('');
   const [materialText, setMaterialText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -242,15 +243,21 @@ export default function CreatePage() {
               <label className="block text-lg font-bold mb-3 text-gray-800">
                 📊 Kokeen pituus (kysymystä per vaikeustaso)
               </label>
-              <Input
-                type="number"
-                min={10}
-                max={50}
-                value={examLength}
-                onChange={(e) => setExamLength(parseInt(e.target.value) || 20)}
-                placeholder="20"
-                className="text-lg"
-              />
+              <div className="space-y-4">
+                <Slider
+                  min={5}
+                  max={20}
+                  step={1}
+                  value={[examLength]}
+                  onValueChange={(value) => setExamLength(value[0])}
+                  className="w-full"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">5 kysymystä</span>
+                  <span className="text-2xl font-bold text-indigo-600">{examLength}</span>
+                  <span className="text-sm text-gray-600">20 kysymystä</span>
+                </div>
+              </div>
               <p className="text-sm text-gray-600 mt-2">
                 Jokainen vaikeustaso sisältää tämän määrän kysymyksiä
               </p>
@@ -260,16 +267,21 @@ export default function CreatePage() {
               <label className="block text-lg font-bold mb-3 text-gray-800">
                 🔢 Materiaalista luotavien kysymysten määrä
               </label>
-              <Input
-                type="number"
-                min={50}
-                max={200}
-                step={10}
-                value={questionCount}
-                onChange={(e) => setQuestionCount(parseInt(e.target.value) || 100)}
-                placeholder="100"
-                className="text-lg"
-              />
+              <div className="space-y-4">
+                <Slider
+                  min={10}
+                  max={100}
+                  step={5}
+                  value={[questionCount]}
+                  onValueChange={(value) => setQuestionCount(value[0])}
+                  className="w-full"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">10 kysymystä</span>
+                  <span className="text-2xl font-bold text-indigo-600">{questionCount}</span>
+                  <span className="text-sm text-gray-600">100 kysymystä</span>
+                </div>
+              </div>
               <p className="text-sm text-gray-600 mt-2">
                 AI luo tämän määrän kysymyksiä materiaalista (jaetaan vaikeusasteille)
               </p>
