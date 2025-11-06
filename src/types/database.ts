@@ -75,7 +75,8 @@ export function parseDatabaseQuestion(dbQuestion: DatabaseQuestion): Question {
         ...base,
         question_type: 'short_answer',
         correct_answer: dbQuestion.correct_answer as string,
-        max_length: dbQuestion.options?.max_length as number | undefined,
+        acceptable_answers: Array.isArray(dbQuestion.options) ? dbQuestion.options as string[] : undefined,
+        max_length: (dbQuestion.options && !Array.isArray(dbQuestion.options)) ? dbQuestion.options.max_length as number | undefined : undefined,
       };
     default:
       throw new Error(`Unknown question type: ${dbQuestion.question_type}`);
