@@ -18,7 +18,7 @@ export function QuestionRenderer({
   showExplanation,
   onAnswerChange,
 }: QuestionRendererProps) {
-  // Store question_type for use in default case (TypeScript exhaustive checking)
+  // Store question type for default case (TypeScript exhaustiveness check)
   const questionType = question.question_type;
 
   switch (questionType) {
@@ -73,8 +73,7 @@ export function QuestionRenderer({
       );
 
     default:
-      // Exhaustive check - this should never happen if all question types are handled
-      const _exhaustiveCheck: never = questionType;
-      return <div>Tuntematon kysymystyyppi: {String(_exhaustiveCheck)}</div>;
+      // This should never happen due to TypeScript type checking, but handle it gracefully at runtime
+      return <div>Tuntematon kysymystyyppi: {questionType}</div>;
   }
 }
