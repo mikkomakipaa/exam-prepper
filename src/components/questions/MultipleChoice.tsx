@@ -17,6 +17,16 @@ export function MultipleChoice({
   showExplanation,
   onAnswerSelect,
 }: MultipleChoiceProps) {
+  // Safety check for empty or missing options
+  if (!question.options || question.options.length === 0) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-800 font-medium">Virhe: Kysymyksellä ei ole vastausvaihtoehtoja.</p>
+        <p className="text-sm text-red-600 mt-1">Oikea vastaus: {question.correct_answer}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {question.options.map((option, index) => {
