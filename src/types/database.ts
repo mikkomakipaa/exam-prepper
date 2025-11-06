@@ -48,7 +48,7 @@ export function parseDatabaseQuestion(dbQuestion: DatabaseQuestion): Question {
       return {
         ...base,
         question_type: 'multiple_choice',
-        options: dbQuestion.options as string[],
+        options: (dbQuestion.options as string[]) || [],
         correct_answer: dbQuestion.correct_answer as string,
       };
     case 'fill_blank':
@@ -68,7 +68,7 @@ export function parseDatabaseQuestion(dbQuestion: DatabaseQuestion): Question {
       return {
         ...base,
         question_type: 'matching',
-        pairs: dbQuestion.correct_answer as Array<{ left: string; right: string }>,
+        pairs: (dbQuestion.correct_answer as Array<{ left: string; right: string }>) || [],
       };
     case 'short_answer':
       return {

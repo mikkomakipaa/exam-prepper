@@ -23,7 +23,9 @@ export function Matching({
 
   useEffect(() => {
     // Shuffle right options once on mount
-    setShuffledRights(shuffleArray(question.pairs.map(p => p.right)));
+    if (question.pairs && question.pairs.length > 0) {
+      setShuffledRights(shuffleArray(question.pairs.map(p => p.right)));
+    }
   }, [question.pairs]);
 
   const handleLeftClick = (left: string) => {
@@ -44,6 +46,15 @@ export function Matching({
     const correctRight = question.pairs.find(p => p.left === left)?.right;
     return userMatches[left] === correctRight;
   };
+
+  // Safety check for empty or missing pairs
+  if (!question.pairs || question.pairs.length === 0) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-800 font-medium">Virhe: Kysymyksellä ei ole yhdistettäviä pareja.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
