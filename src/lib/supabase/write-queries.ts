@@ -79,7 +79,7 @@ export async function createQuestionSet(
         return {
           ...baseQuestion,
           correct_answer: (q as any).correct_answer,
-          options: (q as any).max_length ? { max_length: (q as any).max_length } : null,
+          options: (q as any).acceptable_answers || ((q as any).max_length ? { max_length: (q as any).max_length } : null),
         };
     }
   });
