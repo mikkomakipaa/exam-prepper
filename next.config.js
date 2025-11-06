@@ -5,13 +5,6 @@ const nextConfig = {
       bodySizeLimit: '30mb',
     },
   },
-  // Increase body size limit for API routes to handle file uploads
-  // Max: 5 files × 5MB each = 25MB + text content + overhead = 30MB total
-  api: {
-    bodyParser: {
-      sizeLimit: '30mb',
-    },
-  },
   images: {
     domains: [],
   },
