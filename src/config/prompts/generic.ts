@@ -80,7 +80,7 @@ KYSYMYSTYYPPIEN KÄYTTÖOHJEET:
 2. TRUE_FALSE (totta/tarua):
    - Sopii: väittämät, tosiasiat, käsitteiden ymmärtäminen
    Kysymys: "Totta vai tarua: [väite]"
-   Vastaus: true tai false
+   correct_answer: true tai false (boolean, EI "totta"/"tarua")
 
 3. FILL_BLANK (täydennä):
    - Helppo: yksi puuttuva sana tai luku

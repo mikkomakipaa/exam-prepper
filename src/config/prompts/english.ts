@@ -127,10 +127,10 @@ KYSYMYSTYYPPIEN KÄYTTÖOHJEET:
 
 2. TRUE_FALSE (totta/tarua):
    Kysymys: "Totta vai tarua: Englannin kielessä käytetään artikkelia 'an' ennen vokaalia alkavaa sanaa."
-   Vastaus: true
+   correct_answer: true (boolean, EI "totta"/"tarua")
 
    Kysymys: "Totta vai tarua: Sana 'child' on monikossa 'childs'."
-   Vastaus: false
+   correct_answer: false (boolean, EI "totta"/"tarua")
 
 3. FILL_BLANK (täydennä):
    - Helppo: yksi puuttuva sana
