@@ -139,102 +139,67 @@ export async function generateQuestions(
   );
 
   // Validate and transform questions
-  const questionsWithNulls = parsedQuestions
-    .map((q, index): Question | null => {
-      const base = {
-        id: '', // Will be set by database
-        question_set_id: '', // Will be set by database
-        question_text: q.question,
-        explanation: q.explanation || '',
-        order_index: index,
-      };
+  const questions: Question[] = parsedQuestions.map((q, index) => {
+    const base = {
+      id: '', // Will be set by database
+      question_set_id: '', // Will be set by database
+      question_text: q.question,
+      explanation: q.explanation || '',
+      order_index: index,
+    };
 
-      switch (q.type) {
-        case 'multiple_choice':
-          // Shuffle options to prevent pattern memorization
-          const shuffledOptions = shuffleArray<string>((q.options || []) as string[]);
+    switch (q.type) {
+      case 'multiple_choice':
+        // Shuffle options to prevent pattern memorization
+        const shuffledOptions = shuffleArray(q.options || []);
+        return {
+          ...base,
+          question_type: 'multiple_choice' as const,
+          options: shuffledOptions,
+          correct_answer: q.correct_answer,
+        };
 
-          // Validate that we have at least 2 options
-          if (!shuffledOptions || shuffledOptions.length < 2) {
-            logger.warn(
-              { questionText: q.question.substring(0, 100) },
-              'Skipping multiple_choice question with insufficient options'
-            );
-            return null;
-          }
+      case 'fill_blank':
+        return {
+          ...base,
+          question_type: 'fill_blank' as const,
+          correct_answer: q.correct_answer,
+          acceptable_answers: q.acceptable_answers,
+        };
 
-          return {
-            ...base,
-            question_type: 'multiple_choice' as const,
-            options: shuffledOptions,
-            correct_answer: q.correct_answer as string,
-          };
+      case 'true_false':
+        // Robustly convert to boolean (handles true, "true", "True", 1, etc.)
+        const boolAnswer = typeof q.correct_answer === 'boolean'
+          ? q.correct_answer
+          : typeof q.correct_answer === 'string'
+          ? q.correct_answer.toLowerCase() === 'true' || q.correct_answer === '1'
+          : typeof q.correct_answer === 'number'
+          ? q.correct_answer === 1
+          : Boolean(q.correct_answer);
 
-        case 'fill_blank':
-          return {
-            ...base,
-            question_type: 'fill_blank' as const,
-            correct_answer: q.correct_answer as string,
-            acceptable_answers: q.acceptable_answers as string[] | undefined,
-          };
+        return {
+          ...base,
+          question_type: 'true_false' as const,
+          correct_answer: boolAnswer,
+        };
 
-        case 'true_false':
-          return {
-            ...base,
-            question_type: 'true_false' as const,
-            correct_answer: q.correct_answer === true || q.correct_answer === 'true',
-          };
+      case 'matching':
+        return {
+          ...base,
+          question_type: 'matching' as const,
+          pairs: q.pairs || [],
+        };
 
-        case 'matching':
-          // Validate that we have at least 1 pair
-          if (!q.pairs || q.pairs.length < 1) {
-            logger.warn(
-              { questionText: q.question.substring(0, 100) },
-              'Skipping matching question with no pairs'
-            );
-            return null;
-          }
-
-          return {
-            ...base,
-            question_type: 'matching' as const,
-            pairs: q.pairs as Array<{ left: string; right: string }>,
-          };
-
-        default:
-          // Default to multiple choice if type is unclear
-          const defaultOptions = (q.options || []) as string[];
-          if (defaultOptions.length < 2) {
-            logger.warn(
-              { questionText: q.question.substring(0, 100) },
-              'Skipping question with unknown type and insufficient options'
-            );
-            return null;
-          }
-
-          return {
-            ...base,
-            question_type: 'multiple_choice' as const,
-            options: defaultOptions,
-            correct_answer: q.correct_answer as string,
-          };
-      }
-    });
-
-  // Filter out null values
-  const questions: Question[] = questionsWithNulls.filter((q): q is Question => q !== null);
-
-  // Log if any questions were filtered out
-  if (questions.length < parsedQuestions.length) {
-    logger.warn(
-      {
-        original: parsedQuestions.length,
-        filtered: questions.length,
-        removed: parsedQuestions.length - questions.length,
-      },
-      'Some questions were filtered out due to validation issues'
-    );
-  }
+      default:
+        // Default to multiple choice if type is unclear
+        return {
+          ...base,
+          question_type: 'multiple_choice' as const,
+          options: q.options || [],
+          correct_answer: q.correct_answer,
+        };
+    }
+  });
 
   return questions;
 }
