@@ -274,10 +274,9 @@ main (production) ← afbab8d
 |----------|---------|----------|
 | **CONTRIBUTING.md** | Complete contributor guide | `/CONTRIBUTING.md` |
 | **PR Template** | Auto-populated PR format | `/.github/pull_request_template.md` |
-| **PR Description** | Security fixes PR content | `/.github/PULL_REQUEST_DESCRIPTION.md` |
-| **Security Review** | Vulnerability analysis | `/Documentation/SECURITY_REVIEW.md` |
-| **Security Fixes Summary** | Implementation details | `/Documentation/SECURITY_FIXES_SUMMARY.md` |
-| **This File** | PR and cleanup instructions | `/Documentation/PR_INSTRUCTIONS.md` |
+| **Security Review** | Vulnerability analysis | `/docs/security/SECURITY_REVIEW.md` |
+| **Security Fixes Summary** | Implementation details | `/docs/security/SECURITY_FIXES_SUMMARY.md` |
+| **This File** | PR and cleanup instructions | `/docs/development/PR_INSTRUCTIONS.md` |
 
 ---
 
