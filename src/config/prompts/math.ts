@@ -126,6 +126,7 @@ KYSYMYSTYYPPIEN KÄYTTÖOHJEET:
 2. TRUE_FALSE (totta/tarua):
    - Sopii: käsitteiden ymmärtäminen, sääntöjen tunnistaminen
    - Esim: "Totta vai tarua: Neliön kaikki sivut ovat yhtä pitkiä."
+   - correct_answer: true tai false (boolean, EI "totta"/"tarua")
 
 3. FILL_BLANK (täydennä):
    - Helppo: yksinkertainen numeerinen vastaus
