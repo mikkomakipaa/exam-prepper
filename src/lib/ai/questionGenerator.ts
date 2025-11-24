@@ -206,13 +206,19 @@ export async function generateQuestions(
           pairs: q.pairs || [],
         };
 
+      case 'short_answer':
+        return {
+          ...base,
+          question_type: 'short_answer' as const,
+          correct_answer: q.correct_answer,
+          max_length: q.max_length,
+        };
+
       default:
-        // Default to multiple choice if type is unclear
-        // Note: Should not happen as validation enforces valid types
-        logger.warn(
-          { questionType: q.type, questionText: q.question.substring(0, 50) },
-          'Unknown question type, defaulting to multiple_choice'
-        );
+        // Log unknown type and default to multiple choice
+        console.warn(`Unknown question type: ${q.type}, defaulting to multiple_choice`, {
+          questionText: q.question?.substring(0, 50),
+        });
         return {
           ...base,
           question_type: 'multiple_choice' as const,
